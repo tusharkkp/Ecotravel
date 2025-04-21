@@ -1,0 +1,10 @@
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <path d="M8,20 Q12,5 20,8 Q35,0 32,15 Q40,25 25,32 Q20,40 15,25 Q0,20 8,20 Z" 
+        fill="#5a9c5e" 
+        fill-opacity="0.7" />
+  <path d="M15,20 Q20,15 25,20" 
+        fill="none" 
+        stroke="#fff" 
+        stroke-width="1" 
+        stroke-opacity="0.7" />
+</svg> 

@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/Ecotravel/static/css/main.210f2954.css",
+    "main.js": "/Ecotravel/static/js/main.0ec34b72.js",
+    "index.html": "/Ecotravel/index.html",
+    "static/media/chatbot-logo.svg": "/Ecotravel/static/media/chatbot-logo.9430ad046999c5811eab4c5affb5fcb0.svg",
+    "static/media/leaf-pattern.svg": "/Ecotravel/static/media/leaf-pattern.4d82ae3438dff5f5b983.svg",
+    "static/media/wave-pattern.svg": "/Ecotravel/static/media/wave-pattern.02162d5c492d8177d843.svg",
+    "static/media/leaf.svg": "/Ecotravel/static/media/leaf.b4aea081291c8846898a.svg",
+    "main.210f2954.css.map": "/Ecotravel/static/css/main.210f2954.css.map",
+    "main.0ec34b72.js.map": "/Ecotravel/static/js/main.0ec34b72.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.210f2954.css",
+    "static/js/main.0ec34b72.js"
+  ]
+}
