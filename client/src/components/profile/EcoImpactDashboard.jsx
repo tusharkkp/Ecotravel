@@ -13,7 +13,11 @@ import {
   FaHistory,
   FaAward,
   FaMedal,
-  FaCalendar
+  FaCalendar,
+  FaTicketAlt,
+  FaMapMarkerAlt,
+  FaHotel,
+  FaHiking
 } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import EcoCoinService from '../../services/EcoCoinService';
@@ -202,11 +206,93 @@ const FaHandHoldingHeart = (props) => (
   </svg>
 );
 
+// Booking Item Component 
+const BookingItem = ({ booking }) => {
+  const getBookingTypeIcon = (bookingType) => {
+    switch(bookingType) {
+      case 'transport':
+        return <FaPlane className="text-blue-500" />;
+      case 'accommodation':
+        return <FaHotel className="text-amber-500" />;
+      case 'activity':
+        return <FaHiking className="text-green-500" />;
+      default:
+        return <FaTicketAlt className="text-purple-500" />;
+    }
+  };
+
+  const formattedDate = booking.bookingDate ? 
+    new Date(booking.bookingDate).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }) : 'N/A';
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-3"
+    >
+      <div className="flex items-start">
+        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-3 flex-shrink-0">
+          {getBookingTypeIcon(booking.bookingType)}
+        </div>
+        
+        <div className="flex-grow">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="font-medium">{booking.optionName || 'Unnamed Booking'}</p>
+              <div className="flex items-center text-xs text-gray-500 mt-1">
+                <FaCalendarCheck className="mr-1" />
+                <span>Booked: {formattedDate}</span>
+              </div>
+              {booking.ecoRating && (
+                <div className="flex items-center mt-1">
+                  {[...Array(5)].map((_, i) => (
+                    <FaLeaf 
+                      key={i} 
+                      className={`w-3 h-3 ${i < booking.ecoRating ? 'text-emerald-500' : 'text-gray-300'}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div className="text-right">
+              <div className="font-bold text-amber-600">+{booking.amount} EcoCoins</div>
+              {booking.carbonFootprint && (
+                <p className="text-xs text-gray-600 mt-1">
+                  <span className="text-emerald-500">
+                    {booking.carbonFootprint} kg CO₂ saved
+                  </span>
+                </p>
+              )}
+            </div>
+          </div>
+          
+          {booking.bookingReference && (
+            <div className="mt-2 pt-2 border-t border-gray-100 flex justify-between">
+              <span className="text-xs text-gray-500">
+                Ref: {booking.bookingReference}
+              </span>
+              <span className="text-xs text-emerald-600 font-medium">
+                Confirmed
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
 // Main component
 const EcoImpactDashboard = () => {
   const { currentUser } = useAuth();
   const [summaryData, setSummaryData] = useState(null);
   const [transactions, setTransactions] = useState([]);
+  const [confirmedBookings, setConfirmedBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const cardRef = useRef(null);
 
@@ -223,6 +309,18 @@ const EcoImpactDashboard = () => {
         if (impactSummary.success && transactionHistory.success) {
           setSummaryData(impactSummary);
           setTransactions(transactionHistory.transactions);
+          
+          // Filter booking transactions and extract booking details
+          const bookings = transactionHistory.transactions
+            .filter(tx => tx.type === EcoCoinService.REWARD_TYPES.BOOKING && tx.details)
+            .map(tx => ({
+              ...tx.details,
+              amount: tx.amount,
+              id: tx.id,
+              timestamp: tx.timestamp
+            }));
+          
+          setConfirmedBookings(bookings);
         }
       } catch (error) {
         console.error('Error fetching eco impact data:', error);
@@ -334,6 +432,34 @@ const EcoImpactDashboard = () => {
             ) : (
               transactions.map(transaction => (
                 <TransactionItem key={transaction.id} transaction={transaction} />
+              ))
+            )}
+          </div>
+        </div>
+        
+        {/* Confirmed Bookings */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-8 overflow-hidden">
+          <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 className="text-lg font-bold flex items-center">
+              <FaTicketAlt className="text-emerald-500 mr-2" />
+              Your Confirmed Bookings
+            </h3>
+          </div>
+          
+          <div className="p-4">
+            {confirmedBookings.length === 0 ? (
+              <div className="p-6 text-center text-gray-500">
+                <p>No confirmed bookings yet.</p>
+                <button 
+                  onClick={() => window.location.href = '/compare'}
+                  className="mt-4 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
+                >
+                  Book Eco-Friendly Options
+                </button>
+              </div>
+            ) : (
+              confirmedBookings.map(booking => (
+                <BookingItem key={booking.id} booking={booking} />
               ))
             )}
           </div>

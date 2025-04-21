@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { FaTimes, FaExternalLinkAlt, FaCheckCircle, FaClock } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaTimes, FaExternalLinkAlt, FaCheckCircle, FaClock, FaStar, FaCalendarAlt, FaTicketAlt, FaMapMarkerAlt } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import EcoCoinService from '../../services/EcoCoinService';
 
@@ -127,6 +127,56 @@ const BookingModal = ({ bookingType, bookingOption, onClose }) => {
   const modalVariants = {
     hidden: { opacity: 0, y: 50, scale: 0.95 },
     visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3 } }
+  };
+  
+  // Confetti component for celebration effect
+  const Confetti = () => {
+    const confettiElements = Array.from({ length: 50 }).map((_, i) => {
+      const size = Math.random() * 10 + 5;
+      const x = Math.random() * 100; // Random starting X position (0-100%)
+      const delay = Math.random() * 0.5; // Random delay for each piece
+      const duration = Math.random() * 1 + 1.5; // Random duration between 1.5-2.5s
+      const colors = ['#34D399', '#60A5FA', '#F59E0B', '#8B5CF6', '#EC4899']; // Green, blue, amber, purple, pink
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      
+      return (
+        <motion.div
+          key={i}
+          initial={{ 
+            y: -20, 
+            x: `${x}%`, 
+            opacity: 0, 
+            scale: 0 
+          }}
+          animate={{ 
+            y: ['0%', '100%'], 
+            x: [`${x}%`, `${x + (Math.random() * 40 - 20)}%`], 
+            opacity: [0, 1, 1, 0],
+            rotate: [0, Math.random() * 360 - 180],
+            scale: [0, 1, 1, 0]
+          }}
+          transition={{ 
+            duration: duration, 
+            delay: delay,
+            ease: [0.1, 0.25, 0.1, 1],
+            times: [0, 0.2, 0.8, 1]
+          }}
+          className="absolute"
+          style={{
+            width: size,
+            height: size,
+            borderRadius: Math.random() > 0.5 ? '50%' : '0%',
+            backgroundColor: color,
+          }}
+        />
+      );
+    });
+
+    return (
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {confettiElements}
+      </div>
+    );
   };
   
   return (
@@ -304,61 +354,229 @@ const BookingModal = ({ bookingType, bookingOption, onClose }) => {
               <div className="flex justify-between">
                 <button
                   onClick={onClose}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50"
                 >
                   Cancel
                 </button>
                 
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={handleConfirmBooking}
                   disabled={isProcessing}
-                  className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors flex items-center disabled:opacity-70"
+                  className="px-5 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg transition-all flex items-center disabled:opacity-70 shadow-sm"
                 >
                   {isProcessing ? (
                     <>
-                      <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent mr-2"></div>
+                      <div className="animate-spin h-5 w-5 border-2 border-white rounded-full border-t-transparent mr-2"></div>
                       <span>Processing...</span>
                     </>
                   ) : (
-                    <span>Confirm Booking</span>
+                    <>
+                      <FaCheckCircle className="mr-2" />
+                      <span>Confirm Booking</span>
+                    </>
                   )}
-                </button>
+                </motion.button>
               </div>
             </>
           )}
           
           {bookingState === 'completed' && (
-            <div className="py-8 flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <FaCheckCircle className="text-green-600 text-3xl" />
-              </div>
+            <>
+              <AnimatePresence>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 pointer-events-none"
+                >
+                  <Confetti />
+                </motion.div>
+                
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                >
+                  <svg className="w-full h-full max-w-[300px] max-h-[300px]" viewBox="0 0 100 100">
+                    <motion.circle
+                      cx="50"
+                      cy="50"
+                      r="45"
+                      fill="none"
+                      stroke="#10B981"
+                      strokeWidth="2"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                    />
+                    <motion.path
+                      d="M34 50 L45 65 L70 33"
+                      fill="none"
+                      stroke="#10B981"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.5, delay: 0.5 }}
+                    />
+                  </svg>
+                </motion.div>
+              </AnimatePresence>
               
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Booking Confirmed!</h3>
-              
-              <p className="text-gray-600 mb-6">
-                Your {getTypeLabel().toLowerCase()} booking has been confirmed and you've earned {earnedCoins} EcoCoins!
-              </p>
-              
-              <div className="bg-primary-50 p-4 rounded-lg mb-6 w-full">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">EcoCoins Earned</p>
-                    <p className="text-2xl font-bold text-primary-700">+{earnedCoins}</p>
+              <div className="py-8 flex flex-col items-center justify-center text-center">
+                <motion.div 
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5, type: "spring", delay: 0.8 }}
+                  className="w-20 h-20 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mb-4 shadow-md z-10"
+                >
+                  <FaCheckCircle className="text-green-600 text-4xl" />
+                </motion.div>
+                
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.2 }}
+                  className="relative z-10"
+                >
+                  <motion.h3 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 1.3 }}
+                    className="text-2xl font-semibold text-gray-900 mb-2"
+                  >
+                    Booking Confirmed!
+                  </motion.h3>
+                  
+                  <motion.div 
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 1.4, type: "spring" }}
+                    className="flex items-center justify-center gap-3 mb-3"
+                  >
+                    <motion.div 
+                      whileHover={{ y: -3 }}
+                      className="flex items-center px-3 py-1 bg-green-100 rounded-full text-green-700 text-sm"
+                    >
+                      <FaCheckCircle className="mr-1 text-green-600" /> Confirmed
+                    </motion.div>
+                    
+                    <motion.div 
+                      whileHover={{ y: -3 }}
+                      className="flex items-center px-3 py-1 bg-blue-100 rounded-full text-blue-700 text-sm"
+                    >
+                      <FaTicketAlt className="mr-1 text-blue-600" /> #{Math.floor(1000 + Math.random() * 9000)}
+                    </motion.div>
+                    
+                    <motion.div 
+                      whileHover={{ y: -3 }}
+                      className="flex items-center px-3 py-1 bg-amber-100 rounded-full text-amber-700 text-sm"
+                    >
+                      <FaCalendarAlt className="mr-1 text-amber-600" /> Today
+                    </motion.div>
+                  </motion.div>
+                  
+                  <motion.p 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 1.5 }}
+                    className="text-gray-600 mb-6 max-w-md"
+                  >
+                    Your {getTypeLabel().toLowerCase()} booking has been confirmed and you've earned {earnedCoins} EcoCoins for choosing eco-friendly options!
+                  </motion.p>
+                </motion.div>
+                
+                <motion.div 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 1.6 }}
+                  className="bg-gradient-to-br from-primary-50 to-primary-100 p-6 rounded-xl mb-6 w-full shadow-sm border border-primary-200 relative overflow-hidden"
+                >
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"
+                    initial={{ x: "-100%" }}
+                    animate={{ x: "100%" }}
+                    transition={{ 
+                      delay: 1.9,
+                      duration: 1.5, 
+                      ease: "easeInOut",
+                      repeat: 3,
+                      repeatType: "mirror"
+                    }}
+                  />
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">EcoCoins Earned</p>
+                      <motion.p 
+                        initial={{ scale: 1 }}
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ delay: 1.9, duration: 0.5, repeat: 2, repeatDelay: 1.5 }}
+                        className="text-3xl font-bold text-primary-700"
+                      >
+                        +{earnedCoins}
+                      </motion.p>
+                    </div>
+                    <motion.div 
+                      whileHover={{ scale: 1.05, rotate: 5 }}
+                      className="flex items-center bg-primary-200 px-4 py-2 rounded-full shadow-sm"
+                    >
+                      <span className="font-bold text-primary-800 mr-1">E</span>
+                      <span className="text-sm font-medium text-primary-700">EcoCoins</span>
+                    </motion.div>
                   </div>
-                  <div className="flex items-center bg-primary-100 px-3 py-1 rounded-full">
-                    <span className="font-bold text-primary-700 mr-1">E</span>
-                    <span className="text-sm text-primary-700">EcoCoins</span>
+                  
+                  <div className="mt-4 pt-4 border-t border-primary-200">
+                    <motion.p 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 2.0 }}
+                      className="text-sm text-primary-700 flex items-center"
+                    >
+                      <motion.span 
+                        animate={{ rotate: [0, 360] }}
+                        transition={{ delay: 2.2, duration: 1, repeat: 1 }}
+                      >
+                        <FaStar className="mr-2 text-yellow-500" /> 
+                      </motion.span>
+                      Added to your EcoCoin balance and transaction history!
+                    </motion.p>
                   </div>
-                </div>
+                </motion.div>
+                
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 2.1 }}
+                  className="w-full max-w-sm mb-6 bg-green-50 p-4 rounded-lg border border-green-200"
+                >
+                  <div className="flex items-center">
+                    <div className="mr-3">
+                      <FaMapMarkerAlt className="text-green-600 text-xl" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-medium text-green-800">Your booking details have been sent to</p>
+                      <p className="text-xs text-green-600">{currentUser?.email || 'your registered email'}</p>
+                    </div>
+                  </div>
+                </motion.div>
+                
+                <motion.button
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 2.2 }}
+                  whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={onClose}
+                  className="px-8 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg transition-colors shadow-md"
+                >
+                  Continue Exploring
+                </motion.button>
               </div>
-              
-              <button
-                onClick={onClose}
-                className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
-              >
-                Continue
-              </button>
-            </div>
+            </>
           )}
         </div>
       </motion.div>

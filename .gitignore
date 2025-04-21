@@ -50,3 +50,6 @@ yarn-error.log*
 *.sln
 *.sw? 
 node_modules
+
+# Local Netlify folder
+.netlify
